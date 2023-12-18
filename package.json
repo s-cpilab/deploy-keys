@@ -1,0 +1,17 @@
+{
+  "name": "deploy-keys",
+  "repository": "git@github.com:maroontress/deploy-keys.git",
+  "version": "0.9.0",
+  "description": "Overwrite ~/.gitconfig and ~/.ssh/config with the specified GitHub deploy keys to access other private repositories",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": ["deploy keys"],
+  "author": "Tomohisa Tanaka <Tomohisa.Tanaka@gmail.com>",
+  "license": "BSD-2-Clause",
+  "dependencies": {
+    "@actions/core": "^1.10.1",
+    "@actions/github": "^6.0.0"
+  }
+}

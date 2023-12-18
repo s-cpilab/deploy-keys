@@ -1,0 +1,9 @@
+name: 'maroontress/deploy-keys'
+description: 'Overwrite `~/.gitconfig` and `~/.ssh/config` to access other private repositories'
+inputs:
+  keys:
+    description: 'Deploy keys of other private repositories'
+    required: true
+runs:
+  using: 'node20'
+  main: 'dist/index.js'
