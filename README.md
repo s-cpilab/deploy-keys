@@ -105,6 +105,12 @@ sudo npm i -g @vercel/ncc
 ncc build index.js --license licenses.txt
 ```
 
+## Lint
+
+```plaintext
+npx eslint index.js
+```
+
 [gh:deploy-keys]:
   https://docs.github.com/ja/authentication/connecting-to-github-with-ssh/managing-deploy-keys#deploy-keys
 [gh:vercel_ncc]:
