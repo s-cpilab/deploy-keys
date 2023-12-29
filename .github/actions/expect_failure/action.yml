@@ -1,0 +1,19 @@
+name: 'expect failure'
+description: 'Expects the maroontress/deploy-keys action fails'
+inputs:
+  keys:
+    description: 'SSH private keys'
+    required: true
+runs:
+  using: "composite"
+  steps:
+  - name: Run
+    id: trial
+    uses: ./
+    continue-on-error: true
+    with:
+      keys: ${{inputs.keys}}
+  - name: Assert
+    if: ${{steps.trial.outcome != 'failure'}}
+    shell: bash
+    run: exit 1

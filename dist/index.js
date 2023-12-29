@@ -26625,7 +26625,12 @@ try {
         core.setFailed(EMPTY_KEYS);
         return;
     }
-    const allKeys = keyList.split(/(?=-----BEGIN)/);
+    const trimmedKeyList = keyList.trim();
+    if (trimmedKeyList.length === 0) {
+        core.setFailed(EMPTY_KEYS);
+        return;
+    }
+    const allKeys = trimmedKeyList.split(/(?=-----BEGIN)/);
     const n = allKeys.length;
     if (n === 0) {
         core.setFailed(EMPTY_KEYS);
@@ -26637,15 +26642,32 @@ try {
     console.log(`${knownHostsFile}: created`);
     let sshConfigList = [];
     for (let k = 0; k < n; ++k) {
-        const key = allKeys[k].trim()
-             .split(/\r?\n/)
-             .flatMap(i => [i, '\n'])
+        const keyLines = allKeys[k].trim()
+             .split(/\r?\n/);
+        const key = keyLines.flatMap(i => [i, '\n'])
              .join('');
         const fakeHost = `fake${k}.github.com`;
         const keyFile = path.join(homeDotSshDir, fakeHost);
         const publicKeyFile = keyFile + '.pub';
         fs.writeFileSync(keyFile, key, { mode: 0o400 });
         console.log(`${keyFile}: created`);
+
+        if (keyLines.length < 2) {
+            core.setFailed(`${keyFile}: too short lines`);
+            return;
+        }
+        const firstLine = keyLines[0];
+        const lastLine = keyLines[keyLines.length - 1];
+        if (!firstLine.startsWith('-----BEGIN')
+                || !firstLine.endsWith('-----')
+                || !lastLine.startsWith('-----END')
+                || !lastLine.endsWith('-----')) {
+            core.setFailed(`${keyFile}: `
+                + 'private key must start with the line "-----BEGIN...-----" '
+                + 'and end with the line "-----END...-----"');
+            return;
+        }
+
         child_process.execSync(
             `ssh-keygen -y -f ${keyFile} > ${publicKeyFile}`);
         console.log(`${publicKeyFile}: created`);
@@ -26658,11 +26680,11 @@ try {
         const comment = all[2];
         console.log(`${keyFile}: key comment is "${comment}"`);
         if (!comment.startsWith(COMMENT_PREFIX)) {
-            core.setFailed(`${keyFile}: ${ILLEGAL_KEY_COMMENT_PREFIX}"`);
+            core.setFailed(`${keyFile}: ${ILLEGAL_KEY_COMMENT_PREFIX}`);
             return;
         }
         if (!comment.endsWith(COMMENT_POSTFIX)) {
-            core.setFailed(`${keyFile}: ${ILLEGAL_KEY_COMMENT_POSTFIX}"`);
+            core.setFailed(`${keyFile}: ${ILLEGAL_KEY_COMMENT_POSTFIX}`);
             return;
         }
         const url = comment.slice(0, -COMMENT_POSTFIX.length);

@@ -1,0 +1,113 @@
+name: Test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  test:
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-latest, macos-latest]
+    timeout-minutes: 30
+    runs-on: ${{matrix.os}}
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Empty key
+      uses: ./.github/actions/expect_failure
+      with:
+        keys: ""
+
+    - name: Create an invalid key (not an ssh key, too short)
+      shell: bash
+      run: |
+        rm -rf ~/.ssh invalid*
+        {
+          echo 'KEY<<EOF'
+          echo hello world
+          echo EOF
+        } >> "$GITHUB_ENV"
+    - name: Not an ssh key
+      uses: ./.github/actions/expect_failure
+      with:
+        keys: ${{env.KEY}}
+
+    - name: Create an invalid key (not an ssh key)
+      shell: bash
+      run: |
+        rm -rf ~/.ssh invalid*
+        {
+          echo 'KEY<<EOF'
+          echo hello
+          echo world
+          echo EOF
+        } >> "$GITHUB_ENV"
+    - name: Not an ssh key
+      uses: ./.github/actions/expect_failure
+      with:
+        keys: ${{env.KEY}}
+
+    - name: Create an invalid key (empty comment)
+      shell: bash
+      run: |
+        rm -rf ~/.ssh invalid*
+        ssh-keygen -f invalid -N "" -C ""
+        {
+          echo 'KEY<<EOF'
+          cat invalid
+          echo EOF
+        } >> "$GITHUB_ENV"
+    - name: Empty comment
+      uses: ./.github/actions/expect_failure
+      with:
+        keys: ${{env.KEY}}
+
+    - name: Create an invalid key (no URL)
+      shell: bash
+      run: |
+        rm -rf ~/.ssh invalid*
+        ssh-keygen -f invalid -N "" -C "hello world"
+        {
+          echo 'KEY<<EOF'
+          cat invalid
+          echo EOF
+        } >> "$GITHUB_ENV"
+    - name: No URL
+      uses: ./.github/actions/expect_failure
+      with:
+        keys: ${{env.KEY}}
+
+    - name: Create an invalid key (doesn't start with git@github.com:)
+      shell: bash
+      run: |
+        rm -rf ~/.ssh invalid*
+        ssh-keygen -f invalid -N "" -C "foobar@github.com:foo/bar.git"
+        {
+          echo 'KEY<<EOF'
+          cat invalid
+          echo EOF
+        } >> "$GITHUB_ENV"
+    - name: Bad start
+      uses: ./.github/actions/expect_failure
+      with:
+        keys: ${{env.KEY}}
+
+    - name: Create an invalid key (doesn't end with .git)
+      shell: bash
+      run: |
+        rm -rf ~/.ssh invalid*
+        ssh-keygen -f invalid -N "" -C "git@github.com:foo/bar"
+        {
+          echo 'KEY<<EOF'
+          cat invalid
+          echo EOF
+        } >> "$GITHUB_ENV"
+    - name: Bad end
+      uses: ./.github/actions/expect_failure
+      with:
+        keys: ${{env.KEY}}
