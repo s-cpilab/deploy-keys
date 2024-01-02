@@ -1,8 +1,8 @@
 {
   "name": "deploy-keys",
   "repository": "git@github.com:maroontress/deploy-keys.git",
-  "version": "0.9.0",
-  "description": "Overwrite ~/.gitconfig and ~/.ssh/config with the specified GitHub deploy keys to access other private repositories",
+  "version": "1.0.1",
+  "description": "Configure the Git and SSH with the specified GitHub Deploy Keys to access other private repositories",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

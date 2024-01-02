@@ -34,7 +34,8 @@ the following command: `ssh-keygen … -C 'git@github.com:foo/bar.git'`.
         git clone --depth 1 git@github.com:foo/baz.git
 ```
 
-Please use [a full-length commit SHA][gh:using-shas] instead of `v1`.
+Please use [a full-length commit SHA][gh:using-shas] instead of the tag like
+`v1`. For a more realistic example, see [here][maroontress:try_out].
 
 ## How it works
 
@@ -45,8 +46,9 @@ fake host with the SSH key of the corresponding repository.
 ### 1. `git config`
 
 This action modifies the `~/.gitconfig` file by executing `git config` with
-[`url.<base>.instantOf`][git:url_insteadof] variables for each deploy key.
-After running this action, you can check the configuration with `git config --global --list`, which prints as follows:
+[`url.<base>.instantOf`][git:url_insteadof] variables for each deploy key. After
+running this action, you can check the configuration with
+`git config --global --list`, which prints as follows:
 
 ```plaintext
 url.git@fake0.github.com:foo/bar.insteadof=git@github.com:foo/bar
@@ -121,3 +123,5 @@ npx eslint index.js
   https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions#using-third-party-actions
 [gh:using-shas]:
   https://docs.github.com/en/actions/learn-github-actions/finding-and-customizing-actions#using-shas
+[maroontress:try_out]:
+  https://github.com/maroontress/try_out_github_actions/blob/deploy-keys/.github/workflows/deploy-keys.yml

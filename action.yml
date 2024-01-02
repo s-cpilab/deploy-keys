@@ -1,5 +1,5 @@
 name: 'maroontress/deploy-keys'
-description: 'Overwrite `~/.gitconfig` and `~/.ssh/config` to access other private repositories'
+description: 'Configure the Git and SSH with the specified GitHub Deploy Keys to access other private repositories'
 inputs:
   keys:
     description: 'Deploy keys of other private repositories'
