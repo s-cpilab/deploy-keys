@@ -24,14 +24,20 @@ function runAction(keys, homeDir) {
     return { ...result, home };
 }
 
+function escapeRegExp(value) {
+    return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 function generateKey(dir, name, comment) {
     const keyFile = path.join(dir, name);
-    spawnSync('ssh-keygen', [
+    const result = spawnSync('ssh-keygen', [
         '-f', keyFile,
         '-N', '',
         '-C', comment,
         '-q'
     ]);
+    assert.equal(result.status, 0,
+        `ssh-keygen failed: ${result.error ?? result.stderr}`);
     return fs.readFileSync(keyFile, { encoding: 'utf8' });
 }
 
@@ -113,7 +119,7 @@ test('succeeds with a valid key and configures ssh and git', () => {
     assert.match(sshConfig, /Host fake0\.github\.com/);
     assert.match(sshConfig, /HostName github\.com/);
     assert.match(sshConfig, new RegExp(
-        `IdentityFile ${keyFile.replace(/\\/g, '\\\\')}`));
+        `IdentityFile ${escapeRegExp(keyFile)}`));
 
     const gitConfig = spawnSync('git', [
         'config', '--global', '--get',
